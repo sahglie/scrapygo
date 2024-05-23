@@ -14,8 +14,13 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("<html>Hello world</html>"))
+	mux.HandleFunc("GET /v1/readiness", func(w http.ResponseWriter, r *http.Request) {
+		respondWithJSON(w, http.StatusOK, struct{ Status string }{
+			Status: "ok",
+		})
+	})
+	mux.HandleFunc("GET /v1/error", func(w http.ResponseWriter, r *http.Request) {
+		respondWithError(w, http.StatusInternalServerError, "internal server error")
 	})
 
 	port := os.Getenv("PORT")
