@@ -28,14 +28,10 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /v1/readiness", func(w http.ResponseWriter, r *http.Request) {
-		respondWithJSON(w, http.StatusOK, struct{ Status string }{
-			Status: "ok",
-		})
-	})
-	mux.HandleFunc("GET /v1/error", func(w http.ResponseWriter, r *http.Request) {
-		respondWithError(w, http.StatusInternalServerError, "internal server error")
-	})
+	mux.HandleFunc("GET /v1/readiness", config.handlerReadiness)
+	mux.HandleFunc("GET /v1/error", config.handlerError)
+	mux.HandleFunc("POST /v1/users", config.handlerUserCreate)
+	mux.HandleFunc("GET /v1/users", config.handlerUserList)
 
 	port := os.Getenv("PORT")
 	if port == "" {

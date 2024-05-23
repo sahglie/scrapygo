@@ -1,0 +1,12 @@
+GET http://localhost:8080/v1/users
+Accept: application/json
+
+###
+# Create New User
+POST localhost:8080/v1/users
+Content-Type: application/json
+
+{
+  "name": "    steven hansen"
+}
+
