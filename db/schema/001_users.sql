@@ -1,7 +1,7 @@
 -- +goose Up
 create table users
 (
-    id         integer primary key,
+    id         uuid primary key,
     name       varchar not null,
     created_at timestamptz not null,
     updated_at timestamptz not null
