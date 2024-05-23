@@ -15,7 +15,7 @@ import (
 const createUser = `-- name: CreateUser :one
 INSERT INTO users (id, created_at, updated_at, name)
 VALUES ($1, $2, $3, $4)
-RETURNING id, name, created_at, updated_at, api_key
+RETURNING id, name, api_key, created_at, updated_at
 `
 
 type CreateUserParams struct {
@@ -36,9 +36,33 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.ApiKey,
 		&i.CreatedAt,
 		&i.UpdatedAt,
-		&i.ApiKey,
+	)
+	return i, err
+}
+
+const findUserByApiKey = `-- name: FindUserByApiKey :one
+SELECT id, name, created_at, updated_at from  users
+WHERE api_key = $1
+`
+
+type FindUserByApiKeyRow struct {
+	ID        uuid.UUID
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) FindUserByApiKey(ctx context.Context, apiKey string) (FindUserByApiKeyRow, error) {
+	row := q.db.QueryRowContext(ctx, findUserByApiKey, apiKey)
+	var i FindUserByApiKeyRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

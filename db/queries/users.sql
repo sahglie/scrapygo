@@ -5,3 +5,7 @@ RETURNING *;
 
 -- name: ListUsers :many
 SELECT id, name, created_at, updated_at from  users;
+
+-- name: FindUserByApiKey :one
+SELECT id, name, created_at, updated_at from  users
+WHERE api_key = $1;

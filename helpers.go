@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 type userJSON struct {
@@ -35,4 +36,13 @@ func respondWithError(w http.ResponseWriter, status int, errMsg string) {
 
 	err := errorJSON{Error: errMsg}
 	respondWithJSON(w, status, err)
+}
+
+func extractApiKey(authzHeader string) string {
+	tokens := strings.Split(authzHeader, " ")
+	if len(tokens) != 2 {
+		return ""
+	}
+
+	return tokens[1]
 }

@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/google/uuid"
 	"net/http"
@@ -52,22 +54,24 @@ func (cnf *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) 
 }
 
 func (cnf *appConfig) handlerUserList(w http.ResponseWriter, r *http.Request) {
-	users, err := cnf.DB.ListUsers(context.TODO())
+	apiKey := extractApiKey(r.Header.Get("Authorization"))
+
+	user, err := cnf.DB.FindUserByApiKey(context.TODO(), apiKey)
 	if err != nil {
-		fmt.Printf("failed to retrieve users: %s\n", err)
-		respondWithError(w, http.StatusInternalServerError, "failed to retrieve users")
+		if errors.Is(err, sql.ErrNoRows) {
+			respondWithError(w, http.StatusNotFound, "user not found")
+			return
+		}
+
+		msg := fmt.Sprintf("unexpected error: %s\n", err)
+		respondWithError(w, http.StatusInternalServerError, msg)
 		return
 	}
 
-	userList := userListParams{Data: make([]userParams, len(users))}
-	for i, u := range users {
-		userList.Data[i] = userParams{
-			ID:        u.ID,
-			Name:      u.Name,
-			CreatedAt: u.CreatedAt,
-			UpdatedAt: u.UpdatedAt,
-		}
-	}
-
-	respondWithJSON(w, http.StatusCreated, userList)
+	respondWithJSON(w, http.StatusOK, userParams{
+		ID:        user.ID,
+		Name:      user.Name,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	})
 }
