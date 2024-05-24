@@ -8,7 +8,9 @@ create table feed_follows
     updated_at timestamptz not null,
 
     foreign key (user_id) references users(id) on delete cascade,
-    foreign key (feed_id) references feeds(id) on delete cascade
+    foreign key (feed_id) references feeds(id) on delete cascade,
+
+    unique (feed_id, user_id)
 );
 
 -- +goose Down

@@ -17,12 +17,11 @@ Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1
 
 ###
 # Follow a Feed
-POST localhost:8080/v1/feeds_follows
+POST localhost:8080/v1/feed_follows
 Content-Type: application/json
-#Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
 
 {
-  "name": "The Boot.dev Blog",
-  "url": "https://blog.boot.dev/index.xml"
+  "feed_id": "899825b5-eafc-4626-aece-e2c828d15291"
 }
 

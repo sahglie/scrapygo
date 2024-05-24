@@ -53,7 +53,7 @@ func (cfg *appConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Req
 
 	if err != nil {
 		fmt.Printf("failed to create feed_follow: %s\n", err)
-		respondWithError(w, http.StatusInternalServerError, "failed to create feed")
+		respondWithError(w, http.StatusInternalServerError, "failed to create feed_follow")
 		return
 	}
 
