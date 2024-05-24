@@ -15,3 +15,14 @@ Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1
   "url": "https://blog.boot.dev/index.xml"
 }
 
+###
+# Follow a Feed
+POST localhost:8080/v1/feeds_follows
+Content-Type: application/json
+#Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+
+{
+  "name": "The Boot.dev Blog",
+  "url": "https://blog.boot.dev/index.xml"
+}
+

@@ -27,13 +27,7 @@ func main() {
 		DB: database.New(db),
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("GET /v1/readiness", config.handlerReadiness)
-	mux.HandleFunc("GET /v1/error", config.handlerError)
-	mux.HandleFunc("POST /v1/users", config.handlerUserCreate)
-	mux.HandleFunc("GET /v1/users", config.handlerUserList)
-	mux.HandleFunc("POST /v1/feeds", config.authorizationMiddleware(config.handlerFeedCreate))
-	mux.HandleFunc("GET /v1/feeds", config.handlerFeedList)
+	mux := config.routes()
 
 	port := os.Getenv("PORT")
 	if port == "" {
