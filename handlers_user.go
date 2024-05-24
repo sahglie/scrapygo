@@ -23,7 +23,7 @@ type userListParams struct {
 	Data []userParams `json:"data"`
 }
 
-func (cnf *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
+func (cfg *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
 	params := userParams{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -33,7 +33,7 @@ func (cnf *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	user, err := cnf.DB.CreateUser(context.TODO(), database.CreateUserParams{
+	user, err := cfg.DB.CreateUser(context.TODO(), database.CreateUserParams{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		CreatedAt: time.Now(),
@@ -53,10 +53,10 @@ func (cnf *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (cnf *appConfig) handlerUserList(w http.ResponseWriter, r *http.Request) {
+func (cfg *appConfig) handlerUserList(w http.ResponseWriter, r *http.Request) {
 	apiKey := extractApiKey(r.Header.Get("Authorization"))
 
-	user, err := cnf.DB.FindUserByApiKey(context.TODO(), apiKey)
+	user, err := cfg.DB.FindUserByApiKey(context.TODO(), apiKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondWithError(w, http.StatusNotFound, "user not found")

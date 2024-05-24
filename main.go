@@ -32,6 +32,8 @@ func main() {
 	mux.HandleFunc("GET /v1/error", config.handlerError)
 	mux.HandleFunc("POST /v1/users", config.handlerUserCreate)
 	mux.HandleFunc("GET /v1/users", config.handlerUserList)
+	mux.HandleFunc("POST /v1/feeds", config.authorizationMiddleware(config.handlerFeedCreate))
+	mux.HandleFunc("GET /v1/feeds", config.handlerFeedList)
 
 	port := os.Getenv("PORT")
 	if port == "" {
