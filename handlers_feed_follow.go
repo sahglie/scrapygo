@@ -23,10 +23,6 @@ type feedFollowParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type feedFollowListParams struct {
-	Data []feedFollowParams `json:"data"`
-}
-
 func (cfg *appConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
@@ -66,27 +62,32 @@ func (cfg *appConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Req
 	})
 }
 
-//func (cfg *appConfig) handlerFeedList(w http.ResponseWriter, r *http.Request) {
-//	feeds, err := cfg.DB.GetFeeds(r.Context())
-//	if err != nil {
-//		msg := fmt.Sprintf("unexpected error: %s\n", err)
-//		respondWithError(w, http.StatusInternalServerError, msg)
-//		return
-//	}
-//
-//	feedList := make([]feedParams, len(feeds))
-//	for i, f := range feeds {
-//		feedList[i] = feedParams{
-//			ID:        f.ID,
-//			Name:      f.Name,
-//			Url:       f.Url,
-//			UserId:    f.UserID,
-//			CreatedAt: f.CreatedAt,
-//			UpdatedAt: f.UpdatedAt,
-//		}
-//	}
-//
-//	respondWithJSON(w, http.StatusOK, feedListParams{
-//		Data: feedList,
-//	})
-//}
+func (cfg *appConfig) handlerFeedFollowList(w http.ResponseWriter, r *http.Request) {
+	userId, err := authz.GetAuthzUser(r.Context())
+	if err != nil {
+		respondWithError(w, http.StatusUnauthorized, "not authorized")
+		return
+	}
+
+	feedFollows, err := cfg.DB.GetUserFeedFollows(r.Context(), userId)
+	if err != nil {
+		msg := fmt.Sprintf("unexpected error: %s\n", err)
+		respondWithError(w, http.StatusInternalServerError, msg)
+		return
+	}
+
+	feedFollowList := make([]feedFollowParams, len(feedFollows))
+	for i, ff := range feedFollows {
+		feedFollowList[i] = feedFollowParams{
+			ID:        ff.ID,
+			UserID:    ff.UserID,
+			FeedID:    ff.FeedID,
+			CreatedAt: ff.CreatedAt,
+			UpdatedAt: ff.UpdatedAt,
+		}
+	}
+
+	respondWithJSON(w, http.StatusOK, map[string][]feedFollowParams{
+		"data": feedFollowList,
+	})
+}

@@ -24,10 +24,6 @@ type feedParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type feedListParams struct {
-	Data []feedParams `json:"data"`
-}
-
 func (cfg *appConfig) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("AuthorizedUserId").(uuid.UUID)
 	if !ok {
@@ -89,7 +85,7 @@ func (cfg *appConfig) handlerFeedList(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	respondWithJSON(w, http.StatusOK, feedListParams{
-		Data: feedList,
+	respondWithJSON(w, http.StatusOK, map[string][]feedParams{
+		"data": feedList,
 	})
 }
