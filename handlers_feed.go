@@ -55,13 +55,36 @@ func (cfg *appConfig) handlerFeedCreate(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, feedParams{
-		ID:        feed.ID,
-		Name:      feed.Name,
-		Url:       feed.Url,
-		UserId:    feed.UserID,
-		CreatedAt: feed.CreatedAt,
-		UpdatedAt: feed.UpdatedAt,
+	feedFollow, err := cfg.DB.CreateFeedFollow(context.TODO(), database.CreateFeedFollowParams{
+		ID:        uuid.New(),
+		UserID:    userId,
+		FeedID:    feed.ID,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	})
+
+	if err != nil {
+		fmt.Printf("failed to create feed_follow: %s\n", err)
+		respondWithError(w, http.StatusInternalServerError, "failed to create feed_follow")
+		return
+	}
+
+	respondWithJSON(w, http.StatusCreated, map[string]any{
+		"feed": feedParams{
+			ID:        feed.ID,
+			Name:      feed.Name,
+			Url:       feed.Url,
+			UserId:    feed.UserID,
+			CreatedAt: feed.CreatedAt,
+			UpdatedAt: feed.UpdatedAt,
+		},
+		"feed_follow": feedFollowParams{
+			ID:        feedFollow.ID,
+			UserID:    feedFollow.UserID,
+			FeedID:    feedFollow.FeedID,
+			CreatedAt: feedFollow.CreatedAt,
+			UpdatedAt: feedFollow.UpdatedAt,
+		},
 	})
 }
 
