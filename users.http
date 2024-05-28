@@ -1,6 +1,6 @@
 GET http://localhost:8080/v1/users
 Accept: application/json
-Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
 
 ###
 # Create New User

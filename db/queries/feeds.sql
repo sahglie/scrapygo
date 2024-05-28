@@ -5,4 +5,15 @@ RETURNING *;
 
 -- name: GetFeeds :many
 SELECT id, name, url, user_id, created_at, updated_at
-from feeds;
+FROM feeds;
+
+-- name: GetNextFeedsToFetch :many
+SELECT *
+FROM feeds
+ORDER BY last_fetched_at;
+
+-- name: MarkFeedFetched :exec
+UPDATE feeds
+SET last_fetched_at = now(),
+    updated_at = now()
+where id = $1;

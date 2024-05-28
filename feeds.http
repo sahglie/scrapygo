@@ -8,7 +8,7 @@ Content-Type: application/json
 # Create New Feed
 POST localhost:8080/v1/feeds
 Content-Type: application/json
-Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
 
 {
   "name": "The Boot.dev Blog",
@@ -19,7 +19,7 @@ Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1
 # Follow a Feed
 POST localhost:8080/v1/feed_follows
 Content-Type: application/json
-Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
 
 {
   "feed_id": "899825b5-eafc-4626-aece-e2c828d15291"
@@ -29,4 +29,4 @@ Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1
 # Get Feed follows for a user
 GET localhost:8080/v1/feed_follows
 Content-Type: application/json
-Authorization: ApiKey 47438d7ecb9e13d636b85379df1f0273f87ee3c6709aa75ebc556ca1a1487c4c
+Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
