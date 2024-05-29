@@ -58,8 +58,6 @@ type rssXML struct {
 func FetchFeed(url string) (Feed, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to fetch feed '%s': %s", url, err)
-		fmt.Println(errMsg)
 		return Feed{}, err
 	}
 
@@ -67,15 +65,11 @@ func FetchFeed(url string) (Feed, error) {
 
 	xmlPayload, err := io.ReadAll(resp.Body)
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to read feed from body for: '%s'", url)
-		fmt.Println(errMsg)
 		return Feed{}, err
 	}
 
 	feed, err := parseRssXML(string(xmlPayload))
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to parse feed rss xml for: '%s'", url)
-		fmt.Println(errMsg)
 		return Feed{}, err
 	}
 
@@ -92,15 +86,11 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 
 	err := d.Decode(&rss)
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to xmlPayload unmarshal json: %s", err)
-		fmt.Println(errMsg)
 		return Feed{}, err
 	}
 
 	lastBuildDate, err := parseRssTime(rss.Channel.LastBuildDate)
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to parse time: %s", rss.Channel.LastBuildDate)
-		fmt.Println(errMsg)
 		return Feed{}, err
 	}
 
@@ -138,8 +128,6 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 func parseRssTime(rssTime string) (time.Time, error) {
 	t, err := time.Parse(time.RFC1123Z, rssTime)
 	if err != nil {
-		errMsg := fmt.Sprintf("failed to parse time: %s", rssTime)
-		fmt.Println(errMsg)
 		return time.Time{}, err
 	}
 

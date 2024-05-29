@@ -5,13 +5,15 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"log/slog"
 	"net/http"
 	"os"
 	"scrapygo/internal/database"
 )
 
 type appConfig struct {
-	DB *database.Queries
+	DB     *database.Queries
+	Logger *slog.Logger
 }
 
 func main() {
@@ -20,11 +22,14 @@ func main() {
 		panic(err)
 	}
 
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
+
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)
 
 	config := appConfig{
-		DB: database.New(db),
+		DB:     database.New(db),
+		Logger: logger,
 	}
 
 	mux := config.routes()
