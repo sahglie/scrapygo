@@ -7,6 +7,11 @@ RETURNING *;
 SELECT id, name, url, user_id, created_at, updated_at
 FROM feeds;
 
+-- name: GetFeedByUrl :one
+SELECT *
+FROM feeds
+WHERE url = $1;
+
 -- name: GetNextFeedsToFetch :many
 SELECT *
 FROM feeds

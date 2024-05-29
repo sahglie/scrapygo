@@ -9,17 +9,17 @@ import (
 	"time"
 )
 
-type Feed struct {
+type FeedData struct {
 	Title         string
 	Link          string
 	Description   string
 	Generator     string
 	Language      string
 	LastBuildDate time.Time
-	Entries       []FeedEntry
+	Posts         []PostData
 }
 
-type FeedEntry struct {
+type PostData struct {
 	Title       string
 	Link        string
 	PubDate     time.Time
@@ -55,28 +55,28 @@ type rssXML struct {
 	} `xml:"channel"`
 }
 
-func FetchFeed(url string) (Feed, error) {
+func FetchFeed(url string) (FeedData, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return Feed{}, err
+		return FeedData{}, err
 	}
 
 	defer resp.Body.Close()
 
 	xmlPayload, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return Feed{}, err
+		return FeedData{}, err
 	}
 
 	feed, err := parseRssXML(string(xmlPayload))
 	if err != nil {
-		return Feed{}, err
+		return FeedData{}, err
 	}
 
 	return feed, nil
 }
 
-func parseRssXML(xmlPayload string) (Feed, error) {
+func parseRssXML(xmlPayload string) (FeedData, error) {
 	rss := rssXML{}
 
 	xmlReader := strings.NewReader(xmlPayload)
@@ -86,15 +86,15 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 
 	err := d.Decode(&rss)
 	if err != nil {
-		return Feed{}, err
+		return FeedData{}, err
 	}
 
 	lastBuildDate, err := parseRssTime(rss.Channel.LastBuildDate)
 	if err != nil {
-		return Feed{}, err
+		return FeedData{}, err
 	}
 
-	items := make([]FeedEntry, 0)
+	items := make([]PostData, 0)
 	for _, i := range rss.Channel.Item {
 		t, err := parseRssTime(i.PubDate)
 
@@ -103,7 +103,7 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 			fmt.Println(errMsg)
 		}
 
-		items = append(items, FeedEntry{
+		items = append(items, PostData{
 			Title:       i.Title,
 			Link:        i.Link,
 			PubDate:     t,
@@ -112,14 +112,14 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 		})
 	}
 
-	feed := Feed{
+	feed := FeedData{
 		Title:         rss.Channel.Title,
 		Link:          rss.Channel.Link.Href,
 		Description:   rss.Channel.Description,
 		Generator:     rss.Channel.Generator,
 		Language:      rss.Channel.Language,
 		LastBuildDate: lastBuildDate,
-		Entries:       items,
+		Posts:         items,
 	}
 
 	return feed, nil

@@ -7,3 +7,8 @@ RETURNING *;
 SELECT *
 FROM posts
 where url = $1;
+
+-- name: GetPostsByFeedID :many
+SELECT *
+FROM posts
+where feed_id = $1;
