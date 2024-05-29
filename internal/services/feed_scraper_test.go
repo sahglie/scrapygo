@@ -1,9 +1,23 @@
-package scraper
+package services
 
 import (
+	"context"
+	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
+	"log/slog"
+	"os"
 	"testing"
 )
+
+func Test_ScrapeFeed(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
+	config := NewServiceConfig(logger)
+
+	feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
+	assert.NoError(t, err)
+
+	config.ScrapeFeed(feed)
+}
 
 var xmlPayload = `
 <rss version="2.0">
@@ -42,7 +56,7 @@ var xmlPayload = `
 </rss>
 `
 
-func TestParseFeedXml(t *testing.T) {
+func Test_parseFeedXml(t *testing.T) {
 	feed, err := parseRssXML(xmlPayload)
 	assert.NoError(t, err)
 
@@ -60,13 +74,13 @@ func TestParseFeedXml(t *testing.T) {
 	assert.Equal(t, "2019-07-23 00:00:00 +0000 +0000", i2.PubDate.String())
 }
 
-func TestFetchFeed(t *testing.T) {
+func Test_fetchFeed(t *testing.T) {
 	url := "https://blog.boot.dev/index.xml"
 
-	feed, err := FetchFeed(url)
+	feed, err := fetchFeed(url)
 	assert.NoError(t, err)
 
-	assert.IsType(t, FeedData{}, feed)
+	assert.IsType(t, feedData{}, feed)
 	assert.NotEmpty(t, feed.Title)
 	assert.NotEmpty(t, feed.Description)
 	assert.NotEmpty(t, feed.LastBuildDate)

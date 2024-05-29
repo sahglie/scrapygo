@@ -1,25 +1,98 @@
-package scraper
+package services
 
 import (
+	"context"
+	"database/sql"
 	"encoding/xml"
+	"errors"
 	"fmt"
+	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"scrapygo/internal/database"
 	"strings"
 	"time"
 )
 
-type FeedData struct {
+var ErrPartialScrape = errors.New("partial scrape")
+var ErrFailedScrape = errors.New("failed scrape")
+
+func (cfg *Config) ScrapeFeed(feed database.Feed) error {
+	cfg.Logger.Info("attempting to fetch feed", "url", feed.Url)
+
+	feedData, err := fetchFeed(feed.Url)
+	if err != nil {
+		cfg.Logger.Error("failed to fetch feed", "err", err)
+		return err
+	}
+
+	posts, err := cfg.DB.GetPostsByFeedID(context.TODO(), feed.ID)
+	if err != nil {
+		cfg.Logger.Error("failed to fetch feed", "err", err)
+		return err
+	}
+
+	failedPostUrls := make([]string, 0)
+
+	for _, p := range feedData.Posts {
+		if postAlreadyScraped(p.Link, posts) {
+			continue
+		}
+
+		_, err := cfg.DB.CreatePost(context.TODO(), database.CreatePostParams{
+			ID:     uuid.New(),
+			FeedID: feed.ID,
+			Title:  p.Title,
+			Description: sql.NullString{
+				String: p.Description,
+				Valid:  len(p.Description) > 0,
+			},
+			Url:         p.Link,
+			PublishedAt: p.PubDate,
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
+		})
+
+		if err != nil {
+			cfg.Logger.Error("failed to create post", "url", p.Link, "feedId", feed.ID, "err", err)
+			failedPostUrls = append(failedPostUrls, p.Link)
+		} else {
+			cfg.Logger.Error("created post", "url", p.Link)
+		}
+
+	}
+
+	if len(failedPostUrls) == 0 {
+		return nil
+	}
+
+	if len(failedPostUrls) == len(feedData.Posts) {
+		return ErrFailedScrape
+	}
+
+	return ErrPartialScrape
+}
+
+func postAlreadyScraped(postURL string, posts []database.Post) bool {
+	for _, p := range posts {
+		if p.Url == postURL {
+			return true
+		}
+	}
+	return false
+}
+
+type feedData struct {
 	Title         string
 	Link          string
 	Description   string
 	Generator     string
 	Language      string
 	LastBuildDate time.Time
-	Posts         []PostData
+	Posts         []postData
 }
 
-type PostData struct {
+type postData struct {
 	Title       string
 	Link        string
 	PubDate     time.Time
@@ -55,28 +128,28 @@ type rssXML struct {
 	} `xml:"channel"`
 }
 
-func FetchFeed(url string) (FeedData, error) {
+func fetchFeed(url string) (feedData, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return FeedData{}, err
+		return feedData{}, err
 	}
 
 	defer resp.Body.Close()
 
 	xmlPayload, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return FeedData{}, err
+		return feedData{}, err
 	}
 
 	feed, err := parseRssXML(string(xmlPayload))
 	if err != nil {
-		return FeedData{}, err
+		return feedData{}, err
 	}
 
 	return feed, nil
 }
 
-func parseRssXML(xmlPayload string) (FeedData, error) {
+func parseRssXML(xmlPayload string) (feedData, error) {
 	rss := rssXML{}
 
 	xmlReader := strings.NewReader(xmlPayload)
@@ -86,15 +159,15 @@ func parseRssXML(xmlPayload string) (FeedData, error) {
 
 	err := d.Decode(&rss)
 	if err != nil {
-		return FeedData{}, err
+		return feedData{}, err
 	}
 
 	lastBuildDate, err := parseRssTime(rss.Channel.LastBuildDate)
 	if err != nil {
-		return FeedData{}, err
+		return feedData{}, err
 	}
 
-	items := make([]PostData, 0)
+	items := make([]postData, 0)
 	for _, i := range rss.Channel.Item {
 		t, err := parseRssTime(i.PubDate)
 
@@ -103,7 +176,7 @@ func parseRssXML(xmlPayload string) (FeedData, error) {
 			fmt.Println(errMsg)
 		}
 
-		items = append(items, PostData{
+		items = append(items, postData{
 			Title:       i.Title,
 			Link:        i.Link,
 			PubDate:     t,
@@ -112,7 +185,7 @@ func parseRssXML(xmlPayload string) (FeedData, error) {
 		})
 	}
 
-	feed := FeedData{
+	feed := feedData{
 		Title:         rss.Channel.Title,
 		Link:          rss.Channel.Link.Href,
 		Description:   rss.Channel.Description,
