@@ -49,13 +49,13 @@ func TestParseFeedXml(t *testing.T) {
 	assert.Equal(t, "Boot.dev Blog", feed.Title)
 	assert.Equal(t, "Recent content on Boot.dev Blog", feed.Description)
 	assert.Equal(t, "2024-05-01 00:00:00 +0000 +0000", feed.LastBuildDate.String())
-	assert.Equal(t, 2, len(feed.Items))
+	assert.Equal(t, 2, len(feed.Entries))
 
-	i1 := feed.Items[0]
+	i1 := feed.Entries[0]
 	assert.Equal(t, "The Boot.dev Beat. May 2024", i1.Title)
 	assert.Equal(t, "2024-05-01 00:00:00 +0000 +0000", i1.PubDate.String())
 
-	i2 := feed.Items[1]
+	i2 := feed.Entries[1]
 	assert.Equal(t, "Trustworthy vs Trustless Apps", i2.Title)
 	assert.Equal(t, "2019-07-23 00:00:00 +0000 +0000", i2.PubDate.String())
 }
@@ -70,5 +70,5 @@ func TestFetchFeed(t *testing.T) {
 	assert.NotEmpty(t, feed.Title)
 	assert.NotEmpty(t, feed.Description)
 	assert.NotEmpty(t, feed.LastBuildDate)
-	assert.Greater(t, len(feed.Items), 5)
+	assert.Greater(t, len(feed.Entries), 5)
 }

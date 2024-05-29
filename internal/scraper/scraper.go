@@ -16,10 +16,10 @@ type Feed struct {
 	Generator     string
 	Language      string
 	LastBuildDate time.Time
-	Items         []Item
+	Entries       []FeedEntry
 }
 
-type Item struct {
+type FeedEntry struct {
 	Title       string
 	Link        string
 	PubDate     time.Time
@@ -104,7 +104,7 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 		return Feed{}, err
 	}
 
-	items := make([]Item, 0)
+	items := make([]FeedEntry, 0)
 	for _, i := range rss.Channel.Item {
 		t, err := parseRssTime(i.PubDate)
 
@@ -113,7 +113,7 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 			fmt.Println(errMsg)
 		}
 
-		items = append(items, Item{
+		items = append(items, FeedEntry{
 			Title:       i.Title,
 			Link:        i.Link,
 			PubDate:     t,
@@ -129,7 +129,7 @@ func parseRssXML(xmlPayload string) (Feed, error) {
 		Generator:     rss.Channel.Generator,
 		Language:      rss.Channel.Language,
 		LastBuildDate: lastBuildDate,
-		Items:         items,
+		Entries:       items,
 	}
 
 	return feed, nil
