@@ -17,6 +17,10 @@ import (
 var ErrPartialScrape = errors.New("partial scrape")
 var ErrFailedScrape = errors.New("failed scrape")
 
+func (cfg *Config) GetFeedsToScrap() error {
+	return nil
+}
+
 func (cfg *Config) ScrapeFeed(feed database.Feed) error {
 	cfg.Logger.Info("attempting to fetch feed", "url", feed.Url)
 
