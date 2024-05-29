@@ -1,7 +1,7 @@
 package scraper
 
 import (
-	"fmt"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -43,13 +43,32 @@ var xmlPayload = `
 `
 
 func TestParseFeedXml(t *testing.T) {
-	feed, _ := parseRssXML(xmlPayload)
-	fmt.Printf("%+v\n", feed)
+	feed, err := parseRssXML(xmlPayload)
+	assert.NoError(t, err)
+
+	assert.Equal(t, "Boot.dev Blog", feed.Title)
+	assert.Equal(t, "Recent content on Boot.dev Blog", feed.Description)
+	assert.Equal(t, "2024-05-01 00:00:00 +0000 +0000", feed.LastBuildDate.String())
+	assert.Equal(t, 2, len(feed.Items))
+
+	i1 := feed.Items[0]
+	assert.Equal(t, "The Boot.dev Beat. May 2024", i1.Title)
+	assert.Equal(t, "2024-05-01 00:00:00 +0000 +0000", i1.PubDate.String())
+
+	i2 := feed.Items[1]
+	assert.Equal(t, "Trustworthy vs Trustless Apps", i2.Title)
+	assert.Equal(t, "2019-07-23 00:00:00 +0000 +0000", i2.PubDate.String())
 }
 
 func TestFetchFeed(t *testing.T) {
 	url := "https://blog.boot.dev/index.xml"
-	feed, _ := FetchFeed(url)
 
-	fmt.Printf("%v\n", feed)
+	feed, err := FetchFeed(url)
+	assert.NoError(t, err)
+
+	assert.IsType(t, Feed{}, feed)
+	assert.NotEmpty(t, feed.Title)
+	assert.NotEmpty(t, feed.Description)
+	assert.NotEmpty(t, feed.LastBuildDate)
+	assert.Greater(t, len(feed.Items), 5)
 }

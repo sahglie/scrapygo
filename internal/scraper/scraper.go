@@ -3,6 +3,7 @@ package scraper
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -64,9 +65,7 @@ func FetchFeed(url string) (Feed, error) {
 
 	defer resp.Body.Close()
 
-	xmlPayload := make([]byte, 0)
-	_, err = resp.Body.Read(xmlPayload)
-
+	xmlPayload, err := io.ReadAll(resp.Body)
 	if err != nil {
 		errMsg := fmt.Sprintf("failed to read feed from body for: '%s'", url)
 		fmt.Println(errMsg)
