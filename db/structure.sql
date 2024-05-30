@@ -16,6 +16,25 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_feed_id_fkey;
+ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_user_id_fkey;
+ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_user_id_fkey;
+ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_feed_id_fkey;
+ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
+ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_url_key;
+ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_pkey;
+ALTER TABLE ONLY public.goose_db_version DROP CONSTRAINT goose_db_version_pkey;
+ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_url_key;
+ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_pkey;
+ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_pkey;
+ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_feed_id_user_id_key;
+ALTER TABLE public.goose_db_version ALTER COLUMN id DROP DEFAULT;
+DROP TABLE public.users;
+DROP TABLE public.posts;
+DROP SEQUENCE public.goose_db_version_id_seq;
+DROP TABLE public.goose_db_version;
+DROP TABLE public.feeds;
+DROP TABLE public.feed_follows;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;

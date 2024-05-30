@@ -83,7 +83,7 @@ func (cfg *Config) ScrapeFeed(feed database.Feed) error {
 			cfg.Logger.Error("failed to create post", "url", p.Link, "feedId", feed.ID, "err", err)
 			failedPostUrls = append(failedPostUrls, p.Link)
 		} else {
-			cfg.Logger.Error("created post", "url", p.Link)
+			cfg.Logger.Info("created post", "url", p.Link)
 		}
 
 	}

@@ -1,13 +1,12 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"log/slog"
 	"net/http"
 	"os"
+	"scrapygo/internal/config"
 	"scrapygo/internal/database"
 )
 
@@ -17,20 +16,11 @@ type appConfig struct {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		panic(err)
-	}
-
-	options := &slog.HandlerOptions{AddSource: true}
-	logger := slog.New(slog.NewTextHandler(os.Stdout, options))
-
-	dbURL := os.Getenv("DB_URL")
-	db, err := sql.Open("postgres", dbURL)
+	cfg := config.NewConfig()
 
 	config := appConfig{
-		DB:     database.New(db),
-		Logger: logger,
+		DB:     cfg.DB,
+		Logger: cfg.Logger,
 	}
 
 	mux := config.routes()
@@ -46,7 +36,7 @@ func main() {
 	}
 
 	addr := fmt.Sprintf("%s:%s", host, port)
-	err = http.ListenAndServe(addr, mux)
+	err := http.ListenAndServe(addr, mux)
 	if err != nil {
 		panic(err)
 	}

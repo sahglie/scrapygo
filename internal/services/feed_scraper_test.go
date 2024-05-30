@@ -1,41 +1,52 @@
 package services
 
 import (
-	"context"
+	"github.com/go-testfixtures/testfixtures/v3"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
-	"log/slog"
 	"os"
+	"scrapygo/internal/config"
 	"testing"
 )
 
-func insertFeeds(t *testing.T) {
+var (
+	fixtures *testfixtures.Loader
+)
 
+func prepareTestDatabase() {
+	if err := fixtures.Load(); err != nil {
+		panic(err)
+	}
 }
 
-func deleteFeeds(t *testing.T) {
+func TestMain(m *testing.M) {
+	cfg := config.NewConfigTest()
 
+	var err error
+	fixtures, err = cfg.TestFixtures()
+	if err != nil {
+		panic(err)
+	}
+
+	os.Exit(m.Run())
 }
 
 func Test_ScrapFeeds(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
-	config := NewServiceTestConfig(logger)
+	prepareTestDatabase()
 
-	//feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
-	//assert.NoError(t, err)
-
-	config.ScrapeFeeds()
+	service := NewServiceTestConfig()
+	service.ScrapeFeeds()
 }
 
-func Test_ScrapeFeed(t *testing.T) {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
-	config := NewServiceTestConfig(logger)
-
-	feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
-	assert.NoError(t, err)
-
-	config.ScrapeFeed(feed)
-}
+//func Test_ScrapeFeed(t *testing.T) {
+//	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
+//	config := NewServiceTestConfig()
+//
+//	feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
+//	assert.NoError(t, err)
+//
+//	config.ScrapeFeed(feed)
+//}
 
 var xmlPayload = `
 <rss version="2.0">

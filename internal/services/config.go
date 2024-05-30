@@ -1,10 +1,8 @@
 package services
 
 import (
-	"database/sql"
-	"github.com/joho/godotenv"
 	"log/slog"
-	"os"
+	"scrapygo/internal/config"
 	"scrapygo/internal/database"
 )
 
@@ -13,38 +11,18 @@ type Config struct {
 	Logger *slog.Logger
 }
 
-func NewServiceConfig(logger *slog.Logger) *Config {
-	err := godotenv.Load("../../.env")
-	if err != nil {
-		panic(err)
-	}
-
-	dbURL := os.Getenv("DB_URL")
-	db, err := sql.Open("postgres", dbURL)
-	if err != nil {
-		panic(err)
-	}
-
+func NewServiceConfig() *Config {
+	cfg := config.NewConfig()
 	return &Config{
-		DB:     database.New(db),
-		Logger: logger,
+		DB:     cfg.DB,
+		Logger: cfg.Logger,
 	}
 }
 
-func NewServiceTestConfig(logger *slog.Logger) *Config {
-	err := godotenv.Load("../../.env.test")
-	if err != nil {
-		panic(err)
-	}
-
-	dbURL := os.Getenv("DB_URL")
-	db, err := sql.Open("postgres", dbURL)
-	if err != nil {
-		panic(err)
-	}
-
+func NewServiceTestConfig() *Config {
+	cfg := config.NewConfigTest()
 	return &Config{
-		DB:     database.New(db),
-		Logger: logger,
+		DB:     cfg.DB,
+		Logger: cfg.Logger,
 	}
 }
