@@ -117,14 +117,14 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 	return items, nil
 }
 
-const getNextFeedsToFetch = `-- name: GetNextFeedsToFetch :many
+const getNextFeedsToScrape = `-- name: GetNextFeedsToScrape :many
 SELECT id, name, url, user_id, last_fetched_at, created_at, updated_at
 FROM feeds
 ORDER BY last_fetched_at
 `
 
-func (q *Queries) GetNextFeedsToFetch(ctx context.Context) ([]Feed, error) {
-	rows, err := q.db.QueryContext(ctx, getNextFeedsToFetch)
+func (q *Queries) GetNextFeedsToScrape(ctx context.Context) ([]Feed, error) {
+	rows, err := q.db.QueryContext(ctx, getNextFeedsToScrape)
 	if err != nil {
 		return nil, err
 	}

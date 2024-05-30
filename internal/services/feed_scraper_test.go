@@ -9,9 +9,27 @@ import (
 	"testing"
 )
 
+func insertFeeds(t *testing.T) {
+
+}
+
+func deleteFeeds(t *testing.T) {
+
+}
+
+func Test_ScrapFeeds(t *testing.T) {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
+	config := NewServiceTestConfig(logger)
+
+	//feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
+	//assert.NoError(t, err)
+
+	config.ScrapeFeeds()
+}
+
 func Test_ScrapeFeed(t *testing.T) {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
-	config := NewServiceConfig(logger)
+	config := NewServiceTestConfig(logger)
 
 	feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
 	assert.NoError(t, err)

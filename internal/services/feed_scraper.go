@@ -17,22 +17,44 @@ import (
 var ErrPartialScrape = errors.New("partial scrape")
 var ErrFailedScrape = errors.New("failed scrape")
 
-func (cfg *Config) GetFeedsToScrap() error {
+func (cfg *Config) ScrapeFeeds() error {
+	feeds, err := cfg.DB.GetNextFeedsToScrape(context.TODO())
+	if err != nil {
+		cfg.Logger.Error("failed to fetch feeds", "err", err)
+		return err
+	}
+
+	if len(feeds) == 0 {
+		cfg.Logger.Info("no feeds to scrape")
+		return nil
+	}
+
+	msg := fmt.Sprintf("attempting to scrape %d feeds", len(feeds))
+	cfg.Logger.Info(msg)
+
+	for _, f := range feeds {
+		err = cfg.ScrapeFeed(f)
+		if err != nil {
+			errMsg := fmt.Sprintf("failed to scrape feed %s: %s\n", f.ID, err)
+			return errors.New(errMsg)
+		}
+	}
+
 	return nil
 }
 
 func (cfg *Config) ScrapeFeed(feed database.Feed) error {
-	cfg.Logger.Info("attempting to fetch feed", "url", feed.Url)
+	cfg.Logger.Info("attempting to scrape feed", "url", feed.Url)
 
 	feedData, err := fetchFeed(feed.Url)
 	if err != nil {
-		cfg.Logger.Error("failed to fetch feed", "err", err)
+		cfg.Logger.Error("failed to scrape feed", "err", err)
 		return err
 	}
 
 	posts, err := cfg.DB.GetPostsByFeedID(context.TODO(), feed.ID)
 	if err != nil {
-		cfg.Logger.Error("failed to fetch feed", "err", err)
+		cfg.Logger.Error("failed to scrape feed", "err", err)
 		return err
 	}
 

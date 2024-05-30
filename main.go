@@ -22,7 +22,8 @@ func main() {
 		panic(err)
 	}
 
-	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
+	options := &slog.HandlerOptions{AddSource: true}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, options))
 
 	dbURL := os.Getenv("DB_URL")
 	db, err := sql.Open("postgres", dbURL)

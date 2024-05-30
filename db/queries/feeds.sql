@@ -12,7 +12,7 @@ SELECT *
 FROM feeds
 WHERE url = $1;
 
--- name: GetNextFeedsToFetch :many
+-- name: GetNextFeedsToScrape :many
 SELECT *
 FROM feeds
 ORDER BY last_fetched_at;
