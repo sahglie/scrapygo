@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -11,7 +12,13 @@ import (
 func Test_handlerUserList(t *testing.T) {
 	prepareTestDatabase()
 
-	rs, err := ts.Client().Get(ts.URL + "/v1/users")
+	req, err := http.NewRequest("GET", ts.URL+"/v1/users", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req.Header.Set("Authorization", "Auth bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c")
+	rs, err := ts.Client().Do(req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -22,7 +29,16 @@ func Test_handlerUserList(t *testing.T) {
 
 	body, _ := io.ReadAll(rs.Body)
 
-	assert.Equal(t, "", string(body))
+	var user struct {
+		Name string `json:"name"`
+	}
+
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Equal(t, "steven hansen", user.Name)
 
 }
 
