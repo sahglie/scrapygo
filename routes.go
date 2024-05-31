@@ -2,7 +2,7 @@ package main
 
 import "net/http"
 
-func (cfg *appConfig) routes() http.Handler {
+func (cfg *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	authzUser := cfg.authorizationMiddleware

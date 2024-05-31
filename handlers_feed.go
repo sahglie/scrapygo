@@ -24,7 +24,7 @@ type feedParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (cfg *appConfig) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("AuthorizedUserId").(uuid.UUID)
 	if !ok {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
@@ -88,7 +88,7 @@ func (cfg *appConfig) handlerFeedCreate(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (cfg *appConfig) handlerFeedList(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerFeedList(w http.ResponseWriter, r *http.Request) {
 	feeds, err := cfg.DB.GetFeeds(r.Context())
 	if err != nil {
 		msg := fmt.Sprintf("unexpected error: %s\n", err)

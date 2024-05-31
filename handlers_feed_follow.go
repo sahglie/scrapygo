@@ -23,7 +23,7 @@ type feedFollowParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (cfg *appConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
@@ -62,7 +62,7 @@ func (cfg *appConfig) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Req
 	})
 }
 
-func (cfg *appConfig) handlerFeedFollowList(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerFeedFollowList(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")

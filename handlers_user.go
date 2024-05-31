@@ -23,7 +23,7 @@ type userListParams struct {
 	Data []userParams `json:"data"`
 }
 
-func (cfg *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
 	params := userParams{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -53,7 +53,7 @@ func (cfg *appConfig) handlerUserCreate(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-func (cfg *appConfig) handlerUserList(w http.ResponseWriter, r *http.Request) {
+func (cfg *application) handlerUserList(w http.ResponseWriter, r *http.Request) {
 	apiKey := extractApiKey(r.Header.Get("Authorization"))
 
 	user, err := cfg.DB.FindUserByApiKey(context.TODO(), apiKey)

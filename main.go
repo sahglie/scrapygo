@@ -3,27 +3,21 @@ package main
 import (
 	"fmt"
 	_ "github.com/lib/pq"
-	"log/slog"
 	"net/http"
 	"os"
 	"scrapygo/internal/config"
-	"scrapygo/internal/database"
 )
 
-type appConfig struct {
-	DB     *database.Queries
-	Logger *slog.Logger
+type application struct {
+	*config.AppConfig
 }
 
 func main() {
-	cfg := config.NewConfig()
-
-	config := appConfig{
-		DB:     cfg.DB,
-		Logger: cfg.Logger,
+	app := application{
+		AppConfig: config.NewConfig(),
 	}
 
-	mux := config.routes()
+	mux := app.routes()
 
 	port := os.Getenv("PORT")
 	if port == "" {

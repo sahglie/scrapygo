@@ -23,16 +23,12 @@ ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_feed_id_fkey;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
 ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_url_key;
 ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_pkey;
-ALTER TABLE ONLY public.goose_db_version DROP CONSTRAINT goose_db_version_pkey;
 ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_url_key;
 ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_pkey;
 ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_pkey;
 ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_feed_id_user_id_key;
-ALTER TABLE public.goose_db_version ALTER COLUMN id DROP DEFAULT;
 DROP TABLE public.users;
 DROP TABLE public.posts;
-DROP SEQUENCE public.goose_db_version_id_seq;
-DROP TABLE public.goose_db_version;
 DROP TABLE public.feeds;
 DROP TABLE public.feed_follows;
 SET default_tablespace = '';
@@ -72,42 +68,6 @@ CREATE TABLE public.feeds (
 ALTER TABLE public.feeds OWNER TO app_scrapygo;
 
 --
--- Name: goose_db_version; Type: TABLE; Schema: public; Owner: app_scrapygo
---
-
-CREATE TABLE public.goose_db_version (
-    id integer NOT NULL,
-    version_id bigint NOT NULL,
-    is_applied boolean NOT NULL,
-    tstamp timestamp without time zone DEFAULT now()
-);
-
-
-ALTER TABLE public.goose_db_version OWNER TO app_scrapygo;
-
---
--- Name: goose_db_version_id_seq; Type: SEQUENCE; Schema: public; Owner: app_scrapygo
---
-
-CREATE SEQUENCE public.goose_db_version_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE public.goose_db_version_id_seq OWNER TO app_scrapygo;
-
---
--- Name: goose_db_version_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: app_scrapygo
---
-
-ALTER SEQUENCE public.goose_db_version_id_seq OWNED BY public.goose_db_version.id;
-
-
---
 -- Name: posts; Type: TABLE; Schema: public; Owner: app_scrapygo
 --
 
@@ -141,13 +101,6 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO app_scrapygo;
 
 --
--- Name: goose_db_version id; Type: DEFAULT; Schema: public; Owner: app_scrapygo
---
-
-ALTER TABLE ONLY public.goose_db_version ALTER COLUMN id SET DEFAULT nextval('public.goose_db_version_id_seq'::regclass);
-
-
---
 -- Name: feed_follows feed_follows_feed_id_user_id_key; Type: CONSTRAINT; Schema: public; Owner: app_scrapygo
 --
 
@@ -177,14 +130,6 @@ ALTER TABLE ONLY public.feeds
 
 ALTER TABLE ONLY public.feeds
     ADD CONSTRAINT feeds_url_key UNIQUE (url);
-
-
---
--- Name: goose_db_version goose_db_version_pkey; Type: CONSTRAINT; Schema: public; Owner: app_scrapygo
---
-
-ALTER TABLE ONLY public.goose_db_version
-    ADD CONSTRAINT goose_db_version_pkey PRIMARY KEY (id);
 
 
 --

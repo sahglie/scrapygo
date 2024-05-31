@@ -21,13 +21,10 @@ type AppConfig struct {
 	FixturesPath string
 }
 
-var (
-	projectRoot string
-	dotEnv      string
-)
-
 func NewConfig(dotEnvFiles ...string) *AppConfig {
-	projectRoot = getProjectRoot()
+	var dotEnv string
+
+	projectRoot := getProjectRoot()
 
 	if len(dotEnvFiles) > 0 {
 		dotEnv = dotEnvFiles[0]

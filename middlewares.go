@@ -10,7 +10,7 @@ import (
 
 //type authorizedUserId uuid.UUID
 
-func (cfg *appConfig) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (cfg *application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		apiKey := extractApiKey(r.Header.Get("Authorization"))
 
