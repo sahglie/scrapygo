@@ -8,6 +8,6 @@ POST localhost:8080/v1/users
 Content-Type: application/json
 
 {
-  "name": "steven hansen"
+  "name": "dorian hansen"
 }
 
