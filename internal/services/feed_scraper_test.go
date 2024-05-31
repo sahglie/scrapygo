@@ -9,9 +9,7 @@ import (
 	"testing"
 )
 
-var (
-	fixtures *testfixtures.Loader
-)
+var fixtures *testfixtures.Loader
 
 func prepareTestDatabase() {
 	if err := fixtures.Load(); err != nil {
@@ -20,7 +18,7 @@ func prepareTestDatabase() {
 }
 
 func TestMain(m *testing.M) {
-	cfg := config.NewConfigTest()
+	cfg := config.NewTestConfig()
 
 	var err error
 	fixtures, err = cfg.TestFixtures()

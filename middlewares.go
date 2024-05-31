@@ -10,11 +10,11 @@ import (
 
 //type authorizedUserId uuid.UUID
 
-func (cfg *application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (app *application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		apiKey := extractApiKey(r.Header.Get("Authorization"))
 
-		user, err := cfg.DB.FindUserByApiKey(r.Context(), apiKey)
+		user, err := app.DB.FindUserByApiKey(r.Context(), apiKey)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				respondWithError(w, http.StatusUnauthorized, "not authorized")

@@ -61,7 +61,7 @@ func NewConfig(dotEnvFiles ...string) *AppConfig {
 	return &cfg
 }
 
-func NewConfigTest() *AppConfig {
+func NewTestConfig() *AppConfig {
 	return NewConfig(".env.test")
 }
 

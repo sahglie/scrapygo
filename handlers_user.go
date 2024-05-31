@@ -7,23 +7,24 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 	"net/http"
 	"scrapygo/internal/database"
+	"scrapygo/internal/validator"
 	"time"
 )
 
 type userParams struct {
-	ID        uuid.UUID `json:"id,omitempty"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at,omitempty"`
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	ID                  uuid.UUID `json:"id,omitempty"`
+	Name                string    `json:"name"`
+	CreatedAt           time.Time `json:"created_at,omitempty"`
+	UpdatedAt           time.Time `json:"updated_at,omitempty"`
+	validator.Validator `json:"-"`
 }
 
-type userListParams struct {
-	Data []userParams `json:"data"`
-}
+const ErrPgDuplicateUserName = `pq: duplicate key value violates unique constraint "unique_name_idx"`
 
-func (cfg *application) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
 	params := userParams{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -33,14 +34,25 @@ func (cfg *application) handlerUserCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	user, err := cfg.DB.CreateUser(context.TODO(), database.CreateUserParams{
+	params.CheckField(validator.NotBlank(params.Name), "name", "can't be blank")
+
+	if !params.Valid() {
+		respondWithError(w, http.StatusUnprocessableEntity, params.FirstError())
+		return
+	}
+
+	user, err := app.DB.CreateUser(context.TODO(), database.CreateUserParams{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	})
 	if err != nil {
-		fmt.Printf("failed to create user: %s\n", err)
+		if err.Error() == ErrPgDuplicateUserName {
+			respondWithError(w, http.StatusUnprocessableEntity, "name: already taken")
+			return
+		}
+
 		respondWithError(w, http.StatusInternalServerError, "failed to create user")
 		return
 	}
@@ -53,10 +65,10 @@ func (cfg *application) handlerUserCreate(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (cfg *application) handlerUserList(w http.ResponseWriter, r *http.Request) {
+func (app *application) handlerUserList(w http.ResponseWriter, r *http.Request) {
 	apiKey := extractApiKey(r.Header.Get("Authorization"))
 
-	user, err := cfg.DB.FindUserByApiKey(context.TODO(), apiKey)
+	user, err := app.DB.FindUserByApiKey(context.TODO(), apiKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			respondWithError(w, http.StatusNotFound, "user not found")

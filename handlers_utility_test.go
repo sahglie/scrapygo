@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bytes"
+	"github.com/go-testfixtures/testfixtures/v3"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
@@ -12,13 +12,24 @@ import (
 )
 
 var (
-	app application
-	ts  *httptest.Server
+	app      application
+	ts       *httptest.Server
+	fixtures *testfixtures.Loader
 )
 
+func prepareTestDatabase() {
+	if err := fixtures.Load(); err != nil {
+		panic(err)
+	}
+}
+
 func TestMain(m *testing.M) {
-	app = application{
-		AppConfig: config.NewConfigTest(),
+	app = application{AppConfig: config.NewTestConfig()}
+
+	var err error
+	fixtures, err = app.TestFixtures()
+	if err != nil {
+		panic(err)
 	}
 
 	ts = httptest.NewServer(app.routes())
@@ -39,8 +50,6 @@ func Test_handlerError(t *testing.T) {
 	defer rs.Body.Close()
 
 	body, _ := io.ReadAll(rs.Body)
-	body = bytes.TrimSpace(body)
-
 	assert.Equal(t, `{"error":"internal server error"}`, string(body))
 }
 
@@ -55,7 +64,5 @@ func Test_handlerReadiness(t *testing.T) {
 	defer rs.Body.Close()
 
 	body, _ := io.ReadAll(rs.Body)
-	body = bytes.TrimSpace(body)
-
 	assert.Equal(t, `{"status":"ok"}`, string(body))
 }

@@ -24,7 +24,7 @@ type feedParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-func (cfg *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
+func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("AuthorizedUserId").(uuid.UUID)
 	if !ok {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
@@ -40,7 +40,7 @@ func (cfg *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	feed, err := cfg.DB.CreateFeed(context.TODO(), database.CreateFeedParams{
+	feed, err := app.DB.CreateFeed(context.TODO(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		Name:      params.Name,
 		Url:       params.Url,
@@ -55,7 +55,7 @@ func (cfg *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	feedFollow, err := cfg.DB.CreateFeedFollow(context.TODO(), database.CreateFeedFollowParams{
+	feedFollow, err := app.DB.CreateFeedFollow(context.TODO(), database.CreateFeedFollowParams{
 		ID:        uuid.New(),
 		UserID:    userId,
 		FeedID:    feed.ID,
@@ -88,8 +88,8 @@ func (cfg *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (cfg *application) handlerFeedList(w http.ResponseWriter, r *http.Request) {
-	feeds, err := cfg.DB.GetFeeds(r.Context())
+func (app *application) handlerFeedList(w http.ResponseWriter, r *http.Request) {
+	feeds, err := app.DB.GetFeeds(r.Context())
 	if err != nil {
 		msg := fmt.Sprintf("unexpected error: %s\n", err)
 		respondWithError(w, http.StatusInternalServerError, msg)

@@ -20,7 +20,7 @@ func NewServiceConfig() *Config {
 }
 
 func NewServiceTestConfig() *Config {
-	cfg := config.NewConfigTest()
+	cfg := config.NewTestConfig()
 	return &Config{
 		DB:     cfg.DB,
 		Logger: cfg.Logger,

@@ -7,7 +7,7 @@ import (
 )
 
 func Test_NewConfigTest(t *testing.T) {
-	c := NewConfigTest()
+	c := NewTestConfig()
 
 	tokens := strings.Split(c.ProjectRoot, "/")
 	projectRoot := tokens[len(tokens)-1]

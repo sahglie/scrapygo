@@ -21,6 +21,7 @@ ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_user_id_fkey;
 ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_user_id_fkey;
 ALTER TABLE ONLY public.feed_follows DROP CONSTRAINT feed_follows_feed_id_fkey;
 ALTER TABLE ONLY public.users DROP CONSTRAINT users_pkey;
+ALTER TABLE ONLY public.users DROP CONSTRAINT unique_name_idx;
 ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_url_key;
 ALTER TABLE ONLY public.posts DROP CONSTRAINT posts_pkey;
 ALTER TABLE ONLY public.feeds DROP CONSTRAINT feeds_url_key;
@@ -146,6 +147,14 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.posts
     ADD CONSTRAINT posts_url_key UNIQUE (url);
+
+
+--
+-- Name: users unique_name_idx; Type: CONSTRAINT; Schema: public; Owner: app_scrapygo
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT unique_name_idx UNIQUE (name);
 
 
 --
