@@ -71,7 +71,7 @@ func (app *application) handlerUserList(w http.ResponseWriter, r *http.Request) 
 	user, err := app.DB.FindUserByApiKey(context.TODO(), apiKey)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			respondWithError(w, http.StatusNotFound, "user not found")
+			respondWithError(w, http.StatusUnauthorized, "not authorized")
 			return
 		}
 
