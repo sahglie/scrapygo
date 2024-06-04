@@ -1,6 +1,8 @@
-package main
+package scrapygo
 
-import "net/http"
+import (
+	"net/http"
+)
 
 func (app *application) handlerReadiness(w http.ResponseWriter, r *http.Request) {
 	respondWithJSON(w, http.StatusOK, struct {

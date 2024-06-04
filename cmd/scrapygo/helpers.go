@@ -1,4 +1,4 @@
-package main
+package scrapygo
 
 import (
 	"encoding/json"
@@ -6,14 +6,6 @@ import (
 	"net/http"
 	"strings"
 )
-
-type userJSON struct {
-	Name string `json:"name"`
-}
-
-type errorJSON struct {
-	Error string `json:"error"`
-}
 
 func respondWithJSON(w http.ResponseWriter, status int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
@@ -34,8 +26,11 @@ func respondWithError(w http.ResponseWriter, status int, errMsg string) {
 		errMsg = "something went wrong"
 	}
 
-	err := errorJSON{Error: errMsg}
-	respondWithJSON(w, status, err)
+	respondWithJSON(w, status, struct {
+		Error string `json:"error"`
+	}{
+		Error: errMsg,
+	})
 }
 
 func extractApiKey(authzHeader string) string {

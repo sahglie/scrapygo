@@ -1,4 +1,4 @@
-package main
+package scrapygo
 
 import (
 	"context"
@@ -7,8 +7,6 @@ import (
 	"fmt"
 	"net/http"
 )
-
-//type authorizedUserId uuid.UUID
 
 func (app *application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

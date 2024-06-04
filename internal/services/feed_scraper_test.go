@@ -9,7 +9,10 @@ import (
 	"testing"
 )
 
-var fixtures *testfixtures.Loader
+var (
+	fixtures  *testfixtures.Loader
+	appConfig *config.AppConfig
+)
 
 func prepareTestDatabase() {
 	if err := fixtures.Load(); err != nil {
@@ -18,10 +21,10 @@ func prepareTestDatabase() {
 }
 
 func TestMain(m *testing.M) {
-	cfg := config.NewTestConfig()
+	appConfig = config.NewTestConfig()
 
 	var err error
-	fixtures, err = cfg.TestFixtures()
+	fixtures, err = appConfig.TestFixtures()
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +35,7 @@ func TestMain(m *testing.M) {
 func Test_ScrapFeeds(t *testing.T) {
 	prepareTestDatabase()
 
-	service := NewServiceTestConfig()
+	service := NewConfig(appConfig.DB, appConfig.Logger)
 	service.ScrapeFeeds()
 }
 

@@ -1,4 +1,4 @@
-package main
+package scrapygo
 
 import (
 	"context"

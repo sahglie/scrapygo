@@ -2,7 +2,6 @@ package services
 
 import (
 	"log/slog"
-	"scrapygo/internal/config"
 	"scrapygo/internal/database"
 )
 
@@ -11,18 +10,9 @@ type Config struct {
 	Logger *slog.Logger
 }
 
-func NewServiceConfig() *Config {
-	cfg := config.NewConfig()
+func NewConfig(db *database.Queries, logger *slog.Logger) *Config {
 	return &Config{
-		DB:     cfg.DB,
-		Logger: cfg.Logger,
-	}
-}
-
-func NewServiceTestConfig() *Config {
-	cfg := config.NewTestConfig()
-	return &Config{
-		DB:     cfg.DB,
-		Logger: cfg.Logger,
+		DB:     db,
+		Logger: logger,
 	}
 }
