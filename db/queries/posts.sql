@@ -12,3 +12,8 @@ where url = $1;
 SELECT *
 FROM posts
 where feed_id = $1;
+
+-- name: DeletePostsByFeedID :exec
+DELETE
+FROM posts
+where feed_id = $1;

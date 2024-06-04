@@ -17,15 +17,18 @@ import (
 var ErrPartialScrape = errors.New("partial scrape")
 var ErrFailedScrape = errors.New("failed scrape")
 
-func (cfg *Config) ScrapeFeeds() error {
-	feeds, err := cfg.DB.GetNextFeedsToScrape(context.TODO())
-	if err != nil {
-		cfg.Logger.Error("failed to fetch feeds", "err", err)
-		return err
+func (cfg *Config) ScrapeFeeds(feeds ...database.Feed) error {
+	var err error
+
+	if len(feeds) == 0 {
+		feeds, err = cfg.getFeeds()
+		if err != nil {
+			return err
+		}
 	}
 
 	if len(feeds) == 0 {
-		cfg.Logger.Info("no feeds to scrape")
+		cfg.Logger.Error("no feeds were returned from db")
 		return nil
 	}
 
@@ -33,7 +36,7 @@ func (cfg *Config) ScrapeFeeds() error {
 	cfg.Logger.Info(msg)
 
 	for _, f := range feeds {
-		err = cfg.ScrapeFeed(f)
+		err = cfg.ScrapeFeed(f, feedFetcher)
 		if err != nil {
 			errMsg := fmt.Sprintf("failed to scrape feed %s: %s\n", f.ID, err)
 			return errors.New(errMsg)
@@ -43,10 +46,10 @@ func (cfg *Config) ScrapeFeeds() error {
 	return nil
 }
 
-func (cfg *Config) ScrapeFeed(feed database.Feed) error {
+func (cfg *Config) ScrapeFeed(feed database.Feed, feedFetcher FeedFetcher) error {
 	cfg.Logger.Info("attempting to scrape feed", "url", feed.Url)
 
-	feedData, err := fetchFeed(feed.Url)
+	feedData, err := feedFetcher(feed.Url)
 	if err != nil {
 		cfg.Logger.Error("failed to scrape feed", "err", err)
 		return err
@@ -99,6 +102,16 @@ func (cfg *Config) ScrapeFeed(feed database.Feed) error {
 	return ErrPartialScrape
 }
 
+func (cfg *Config) getFeeds() ([]database.Feed, error) {
+	feeds, err := cfg.DB.GetNextFeedsToScrape(context.TODO())
+	if err != nil {
+		cfg.Logger.Error("failed to fetch feeds", "err", err)
+		return nil, err
+	}
+
+	return feeds, nil
+}
+
 func postAlreadyScraped(postURL string, posts []database.Post) bool {
 	for _, p := range posts {
 		if p.Url == postURL {
@@ -118,12 +131,32 @@ type feedData struct {
 	Posts         []postData
 }
 
+func (fd *feedData) trimFields() {
+	fd.Title = strings.TrimSpace(fd.Title)
+	fd.Link = strings.TrimSpace(fd.Link)
+	fd.Description = strings.TrimSpace(fd.Description)
+	fd.Generator = strings.TrimSpace(fd.Generator)
+	fd.Language = strings.TrimSpace(fd.Language)
+
+	for i, p := range fd.Posts {
+		p.trimFields()
+		fd.Posts[i] = p
+	}
+}
+
 type postData struct {
 	Title       string
 	Link        string
 	PubDate     time.Time
 	Guid        string
 	Description string
+}
+
+func (pd *postData) trimFields() {
+	pd.Title = strings.TrimSpace(pd.Title)
+	pd.Link = strings.TrimSpace(pd.Link)
+	pd.Guid = strings.TrimSpace(pd.Guid)
+	pd.Description = strings.TrimSpace(pd.Description)
 }
 
 type rssXML struct {
@@ -154,7 +187,9 @@ type rssXML struct {
 	} `xml:"channel"`
 }
 
-func fetchFeed(url string) (feedData, error) {
+type FeedFetcher func(url string) (feedData, error)
+
+func feedFetcher(url string) (feedData, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return feedData{}, err
@@ -172,6 +207,7 @@ func fetchFeed(url string) (feedData, error) {
 		return feedData{}, err
 	}
 
+	feed.trimFields()
 	return feed, nil
 }
 

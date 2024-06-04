@@ -1,11 +1,14 @@
 package services
 
 import (
+	"context"
 	"github.com/go-testfixtures/testfixtures/v3"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"os"
 	"scrapygo/internal/config"
+	"strings"
 	"testing"
 )
 
@@ -35,19 +38,72 @@ func TestMain(m *testing.M) {
 func Test_ScrapFeeds(t *testing.T) {
 	prepareTestDatabase()
 
+	feeds, err := appConfig.DB.GetFeeds(context.TODO())
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(feeds))
+
+	t.Cleanup(func() {
+		appConfig.DB.DeletePostsByFeedID(context.TODO(), feeds[0].ID)
+	})
+
+	posts, err := appConfig.DB.GetPostsByFeedID(context.TODO(), feeds[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, 0, len(posts))
+
 	service := NewConfig(appConfig.DB, appConfig.Logger)
 	service.ScrapeFeeds()
+
+	posts, err = appConfig.DB.GetPostsByFeedID(context.TODO(), feeds[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Greater(t, len(posts), 20)
 }
 
-//func Test_ScrapeFeed(t *testing.T) {
-//	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{AddSource: true}))
-//	config := NewServiceTestConfig()
-//
-//	feed, err := config.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
-//	assert.NoError(t, err)
-//
-//	config.ScrapeFeed(feed)
-//}
+func Test_ScrapeFeed(t *testing.T) {
+	prepareTestDatabase()
+
+	feed, err := appConfig.DB.GetFeedByUrl(context.TODO(), "https://blog.boot.dev/index.xml")
+	assert.NoError(t, err)
+
+	t.Cleanup(func() {
+		appConfig.DB.DeletePostsByFeedID(context.TODO(), feed.ID)
+	})
+
+	posts, err := appConfig.DB.GetPostsByFeedID(context.TODO(), feed.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, 0, len(posts))
+
+	service := NewConfig(appConfig.DB, appConfig.Logger)
+	service.ScrapeFeed(feed, testFeedFetcher)
+
+	posts, err = appConfig.DB.GetPostsByFeedID(context.TODO(), feed.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	assert.Equal(t, 2, len(posts))
+}
+
+func testFeedFetcher(url string) (feedData, error) {
+	r := strings.NewReader(xmlPayload)
+
+	xmlPayload, err := io.ReadAll(r)
+	if err != nil {
+		return feedData{}, err
+	}
+
+	feed, err := parseRssXML(string(xmlPayload))
+	if err != nil {
+		return feedData{}, err
+	}
+
+	feed.trimFields()
+	return feed, nil
+}
 
 var xmlPayload = `
 <rss version="2.0">
@@ -107,7 +163,7 @@ func Test_parseFeedXml(t *testing.T) {
 func Test_fetchFeed(t *testing.T) {
 	url := "https://blog.boot.dev/index.xml"
 
-	feed, err := fetchFeed(url)
+	feed, err := feedFetcher(url)
 	assert.NoError(t, err)
 
 	assert.IsType(t, feedData{}, feed)
