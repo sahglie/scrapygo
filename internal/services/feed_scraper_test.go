@@ -40,7 +40,7 @@ func Test_ScrapFeeds(t *testing.T) {
 
 	feeds, err := appConfig.DB.GetFeeds(context.TODO())
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(feeds))
+	assert.Equal(t, 2, len(feeds))
 
 	t.Cleanup(func() {
 		appConfig.DB.DeletePostsByFeedID(context.TODO(), feeds[0].ID)
