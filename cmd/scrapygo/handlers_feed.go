@@ -7,12 +7,14 @@ import (
 	"github.com/google/uuid"
 	"net/http"
 	"scrapygo/internal/database"
+	"scrapygo/internal/validator"
 	"time"
 )
 
 type createFeedParams struct {
-	Name string `json:"name"`
-	Url  string `json:"url"`
+	Name                string `json:"name"`
+	Url                 string `json:"url"`
+	validator.Validator `json:"-"`
 }
 
 type feedParams struct {
@@ -23,6 +25,8 @@ type feedParams struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+const ErrPgDuplicateFeedUrl = `pq: duplicate key value violates unique constraint "feeds_url_key"`
 
 func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("AuthorizedUserId").(uuid.UUID)
@@ -40,6 +44,14 @@ func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	params.CheckField(validator.NotBlank(params.Name), "name", "can't be blank")
+	params.CheckField(validator.NotBlank(params.Url), "url", "can't be blank")
+
+	if !params.Valid() {
+		respondWithError(w, http.StatusUnprocessableEntity, params.FirstError())
+		return
+	}
+
 	feed, err := app.DB.CreateFeed(context.TODO(), database.CreateFeedParams{
 		ID:        uuid.New(),
 		Name:      params.Name,
@@ -50,7 +62,11 @@ func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 	})
 
 	if err != nil {
-		fmt.Printf("failed to create feed: %s\n", err)
+		if err.Error() == ErrPgDuplicateFeedUrl {
+			respondWithError(w, http.StatusUnprocessableEntity, "url: already taken")
+			return
+		}
+
 		respondWithError(w, http.StatusInternalServerError, "failed to create feed")
 		return
 	}
