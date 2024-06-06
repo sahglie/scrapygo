@@ -4,8 +4,23 @@ import (
 	"github.com/stretchr/testify/assert"
 	"io"
 	"net/http"
+	"strings"
 	"testing"
 )
+
+var postList string = `
+{"data":
+  [{"id":"5d0ebc37-27dd-4c8a-b28b-10fd41939e9d",
+    "feed_id":"5b024738-1068-4e44-b852-9fcfc80222e0",
+    "title":"The-Zen-of-Proverbs",
+    "description":"20-rules",
+    "url":"https://wagslane.dev/posts/zen-of-proverbs/",
+    "published_at":"2023-01-07T16:00:00-08:00",
+    "created_at":"2024-06-05T21:09:41.466485-07:00",
+    "updated_at":"2024-06-05T21:09:41.466485-07:00"
+   }]
+}
+`
 
 func Test_handlerPostList(t *testing.T) {
 	prepareTestDatabase()
@@ -23,32 +38,8 @@ func Test_handlerPostList(t *testing.T) {
 			urlPath:  "/v1/posts",
 			apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
 			wantCode: http.StatusOK,
-			wantBody: "stuff",
+			wantBody: strings.Join(strings.Fields(postList), ""),
 		},
-		//{
-		//	name:     "Returns error when field 'url' is missing",
-		//	urlPath:  "/v1/feeds",
-		//	reqBody:  `{"name": "howdy", "url": ""}`,
-		//	apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
-		//	wantCode: http.StatusUnprocessableEntity,
-		//	wantBody: `{"error":"url: can't be blank"}`,
-		//},
-		//{
-		//	name:     "Returns error when field 'name' is missing",
-		//	urlPath:  "/v1/feeds",
-		//	reqBody:  `{"name": "", "url": "https://howdy.io/index.xml"}`,
-		//	apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
-		//	wantCode: http.StatusUnprocessableEntity,
-		//	wantBody: `{"error":"name: can't be blank"}`,
-		//},
-		//{
-		//	name:     "Returns error when field 'url' already exists",
-		//	urlPath:  "/v1/feeds",
-		//	reqBody:  `{"name": "The Boot.dev Blog", "url": "https://blog.boot.dev/index.xml"}`,
-		//	apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
-		//	wantCode: http.StatusUnprocessableEntity,
-		//	wantBody: `{"error":"url: already taken"}`,
-		//},
 	}
 
 	for _, tt := range tests {
@@ -75,67 +66,3 @@ func Test_handlerPostList(t *testing.T) {
 		})
 	}
 }
-
-//func Test_handlerFeedList(t *testing.T) {
-//	prepareTestDatabase()
-//
-//	tests := []struct {
-//		name     string
-//		urlPath  string
-//		apiKey   string
-//		wantCode int
-//		wantBody string
-//	}{
-//		{
-//			name:     "Authenticated User",
-//			urlPath:  "/v1/users",
-//			apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
-//			wantCode: http.StatusOK,
-//			wantBody: `{"id":"606a0cd9-65ae-4fdf-b2b9-52cf7cdcb04c","name":"steven hansen","created_at":"2024-05-30T00:00:00-07:00","updated_at":"2024-05-30T00:00:00-07:00"}`,
-//		},
-//		{
-//			name:     "Unauthorized User",
-//			urlPath:  "/v1/users",
-//			apiKey:   "invalidApiKey",
-//			wantCode: http.StatusUnauthorized,
-//			wantBody: `{"error":"not authorized"}`,
-//		},
-//		{
-//			name:     "Missing Authentication Header",
-//			urlPath:  "/v1/users",
-//			apiKey:   "",
-//			wantCode: http.StatusUnauthorized,
-//			wantBody: `{"error":"not authorized"}`,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			req, err := http.NewRequest("GET", ts.URL+tt.urlPath, nil)
-//			if err != nil {
-//				t.Fatal(err)
-//			}
-//
-//			req.Header.Set("Authorization", "Auth "+tt.apiKey)
-//			rs, err := ts.Client().Do(req)
-//			if err != nil {
-//				t.Fatal(err)
-//			}
-//			if err != nil {
-//				t.Fatal(err)
-//			}
-//
-//			defer rs.Body.Close()
-//
-//			assert.Equal(t, tt.wantCode, rs.StatusCode)
-//
-//			if tt.wantBody != "" {
-//				body, err := io.ReadAll(rs.Body)
-//				if err != nil {
-//					t.Fatal(err)
-//				}
-//				assert.Contains(t, tt.wantBody, string(body))
-//			}
-//		})
-//	}
-//}
