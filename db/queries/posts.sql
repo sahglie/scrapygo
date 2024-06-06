@@ -17,3 +17,8 @@ where feed_id = $1;
 DELETE
 FROM posts
 where feed_id = $1;
+
+-- name: GetPostsByUserID :many
+SELECT p.*
+FROM posts p LEFT JOIN feed_follows ff on ff.feed_id = p.feed_id
+where user_id = $1;

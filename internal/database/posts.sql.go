@@ -125,3 +125,41 @@ func (q *Queries) GetPostsByFeedID(ctx context.Context, feedID uuid.UUID) ([]Pos
 	}
 	return items, nil
 }
+
+const getPostsByUserID = `-- name: GetPostsByUserID :many
+SELECT p.id, p.feed_id, p.title, p.description, p.url, p.published_at, p.created_at, p.updated_at
+FROM posts p LEFT JOIN feed_follows ff on ff.feed_id = p.feed_id
+where user_id = $1
+`
+
+func (q *Queries) GetPostsByUserID(ctx context.Context, userID uuid.UUID) ([]Post, error) {
+	rows, err := q.db.QueryContext(ctx, getPostsByUserID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Post
+	for rows.Next() {
+		var i Post
+		if err := rows.Scan(
+			&i.ID,
+			&i.FeedID,
+			&i.Title,
+			&i.Description,
+			&i.Url,
+			&i.PublishedAt,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

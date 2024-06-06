@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("GET /v1/feeds", authzUser(app.handlerFeedList))
 	mux.HandleFunc("POST /v1/feed_follows", authzUser(app.handlerFeedFollowCreate))
 	mux.HandleFunc("GET /v1/feed_follows", authzUser(app.handlerFeedFollowList))
+	mux.HandleFunc("GET /v1/posts", authzUser(app.handlerPostList))
 
 	return mux
 }
