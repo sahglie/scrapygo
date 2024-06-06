@@ -23,6 +23,8 @@ type feedFollowParams struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+const ErrPgDuplicateFeedFollow = `pq: duplicate key value violates unique constraint "feed_follows_feed_id_user_id_key"`
+
 func (app *application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
@@ -48,7 +50,11 @@ func (app *application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.R
 	})
 
 	if err != nil {
-		fmt.Printf("failed to create feed_follow: %s\n", err)
+		if err.Error() == ErrPgDuplicateFeedFollow {
+			respondWithError(w, http.StatusUnprocessableEntity, "user is already following that feed")
+			return
+		}
+
 		respondWithError(w, http.StatusInternalServerError, "failed to create feed_follow")
 		return
 	}

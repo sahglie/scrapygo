@@ -46,7 +46,6 @@ func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 
 	params.CheckField(validator.NotBlank(params.Name), "name", "can't be blank")
 	params.CheckField(validator.NotBlank(params.Url), "url", "can't be blank")
-
 	if !params.Valid() {
 		respondWithError(w, http.StatusUnprocessableEntity, params.FirstError())
 		return
@@ -80,7 +79,11 @@ func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 	})
 
 	if err != nil {
-		fmt.Printf("failed to create feed_follow: %s\n", err)
+		if err.Error() == ErrPgDuplicateFeedFollow {
+			respondWithError(w, http.StatusUnprocessableEntity, "user is already following that feed")
+			return
+		}
+
 		respondWithError(w, http.StatusInternalServerError, "failed to create feed_follow")
 		return
 	}

@@ -20,9 +20,9 @@ func Test_handlerFeedCreate(t *testing.T) {
 		wantBody string
 	}{
 		{
-			name:     "Creates a Valid Feed",
+			name:     "Creates a Feed",
 			urlPath:  "/v1/feeds",
-			reqBody:  `{"name": "wagslane", "url": "https://wagslane.dev/index.xml"}`,
+			reqBody:  `{"name": "howdy", "url": "https://howdy.io/index.xml"}`,
 			apiKey:   "bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c",
 			wantCode: http.StatusCreated,
 			wantBody: "",

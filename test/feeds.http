@@ -11,7 +11,7 @@ Content-Type: application/json
 Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
 
 {
-  "name": "The Boot.dev Blog",
+  "name": "Wagslane",
   "url": "https://blog.boot.dev/index.xml"
 }
 

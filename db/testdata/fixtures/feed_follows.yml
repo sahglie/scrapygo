@@ -1,0 +1,6 @@
+
+- id: "4adab4e2-fc2d-4563-8644-1fa5b4256ffe"
+  feed_id: "5b024738-1068-4e44-b852-9fcfc80222e0"
+  user_id: "606a0cd9-65ae-4fdf-b2b9-52cf7cdcb04c"
+  created_at: RAW=NOW() - (INTERVAL '1 hours')
+  updated_at: RAW=NOW() - (INTERVAL '1 hours')
