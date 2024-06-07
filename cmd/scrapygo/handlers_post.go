@@ -19,7 +19,7 @@ type postParams struct {
 	UpdatedAt   time.Time `json:"updated_at"`
 }
 
-func (app *application) handlerPostList(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerPostList(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")

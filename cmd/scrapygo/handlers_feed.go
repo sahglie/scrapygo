@@ -28,7 +28,7 @@ type feedParams struct {
 
 const ErrPgDuplicateFeedUrl = `pq: duplicate key value violates unique constraint "feeds_url_key"`
 
-func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerFeedCreate(w http.ResponseWriter, r *http.Request) {
 	userId, ok := r.Context().Value("AuthorizedUserId").(uuid.UUID)
 	if !ok {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
@@ -107,7 +107,7 @@ func (app *application) handlerFeedCreate(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (app *application) handlerFeedList(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerFeedList(w http.ResponseWriter, r *http.Request) {
 	feeds, err := app.DB.GetFeeds(r.Context())
 	if err != nil {
 		msg := fmt.Sprintf("unexpected error: %s\n", err)

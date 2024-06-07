@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	app      application
+	app      Application
 	ts       *httptest.Server
 	fixtures *testfixtures.Loader
 )
@@ -21,7 +21,7 @@ func prepareTestDatabase() {
 }
 
 func TestMain(m *testing.M) {
-	app = application{AppConfig: config.NewTestConfig()}
+	app = Application{AppConfig: config.NewTestConfig()}
 
 	var err error
 	fixtures, err = app.TestFixtures()
@@ -29,7 +29,7 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	ts = httptest.NewServer(app.routes())
+	ts = httptest.NewServer(app.Routes())
 	defer ts.Close()
 
 	code := m.Run()

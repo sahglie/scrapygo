@@ -8,7 +8,7 @@ import (
 )
 
 func respondWithJSON(w http.ResponseWriter, status int, payload interface{}) {
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "Application/json")
 
 	data, err := json.Marshal(payload)
 	if err != nil {

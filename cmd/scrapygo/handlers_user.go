@@ -24,7 +24,7 @@ type userParams struct {
 
 const ErrPgDuplicateUserName = `pq: duplicate key value violates unique constraint "unique_name_idx"`
 
-func (app *application) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerUserCreate(w http.ResponseWriter, r *http.Request) {
 	params := userParams{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -65,7 +65,7 @@ func (app *application) handlerUserCreate(w http.ResponseWriter, r *http.Request
 	})
 }
 
-func (app *application) handlerUserList(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerUserList(w http.ResponseWriter, r *http.Request) {
 	apiKey := extractApiKey(r.Header.Get("Authorization"))
 
 	user, err := app.DB.FindUserByApiKey(context.TODO(), apiKey)

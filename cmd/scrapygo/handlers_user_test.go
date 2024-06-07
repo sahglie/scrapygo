@@ -45,7 +45,7 @@ func Test_handlerUserCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			reqBody := strings.NewReader(tt.reqBody)
 
-			rs, err := ts.Client().Post(ts.URL+tt.urlPath, "Content-Type: application/json", reqBody)
+			rs, err := ts.Client().Post(ts.URL+tt.urlPath, "Content-Type: Application/json", reqBody)
 			if err != nil {
 				t.Fatal(err)
 			}

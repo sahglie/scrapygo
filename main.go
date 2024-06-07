@@ -1,23 +1,21 @@
-package scrapygo
+package main
 
 import (
 	"fmt"
 	_ "github.com/lib/pq"
 	"net/http"
 	"os"
+	"scrapygo/cmd/scrapygo"
 	"scrapygo/internal/config"
+	"time"
 )
 
-type application struct {
-	*config.AppConfig
-}
-
 func main() {
-	app := application{
+	app := scrapygo.Application{
 		AppConfig: config.NewConfig(),
 	}
 
-	mux := app.routes()
+	mux := app.Routes()
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -29,7 +27,13 @@ func main() {
 		host = "localhost"
 	}
 
+	quit := make(chan bool)
+	app.ScrapeOnInterval(quit, 30*time.Second)
+
+	defer close(quit)
+
 	addr := fmt.Sprintf("%s:%s", host, port)
+	app.Logger.Info("starting http server")
 	err := http.ListenAndServe(addr, mux)
 	if err != nil {
 		panic(err)

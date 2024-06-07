@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func (app *application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
+func (app *Application) authorizationMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		apiKey := extractApiKey(r.Header.Get("Authorization"))
 

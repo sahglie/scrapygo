@@ -4,7 +4,7 @@ import (
 	"net/http"
 )
 
-func (app *application) routes() http.Handler {
+func (app *Application) Routes() http.Handler {
 	mux := http.NewServeMux()
 
 	authzUser := app.authorizationMiddleware

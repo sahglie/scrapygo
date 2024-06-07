@@ -25,7 +25,7 @@ type feedFollowParams struct {
 
 const ErrPgDuplicateFeedFollow = `pq: duplicate key value violates unique constraint "feed_follows_feed_id_user_id_key"`
 
-func (app *application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
@@ -68,7 +68,7 @@ func (app *application) handlerFeedFollowCreate(w http.ResponseWriter, r *http.R
 	})
 }
 
-func (app *application) handlerFeedFollowList(w http.ResponseWriter, r *http.Request) {
+func (app *Application) handlerFeedFollowList(w http.ResponseWriter, r *http.Request) {
 	userId, err := authz.GetAuthzUser(r.Context())
 	if err != nil {
 		respondWithError(w, http.StatusUnauthorized, "not authorized")
