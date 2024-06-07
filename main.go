@@ -28,7 +28,7 @@ func main() {
 	}
 
 	quit := make(chan bool)
-	app.ScrapeOnInterval(quit, 30*time.Second)
+	go app.ScrapeOnInterval(quit, 60*time.Second)
 
 	defer close(quit)
 
