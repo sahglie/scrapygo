@@ -46,10 +46,14 @@ func (cfg *Config) ScrapeFeeds(feeds ...database.Feed) error {
 	return nil
 }
 
-func (cfg *Config) ScrapeFeed(feed database.Feed, feedFetcher FeedFetcher) error {
+func (cfg *Config) ScrapeFeed(feed database.Feed, fetcher FeedFetcher) error {
 	cfg.Logger.Info("attempting to scrape feed", "url", feed.Url)
 
-	feedData, err := feedFetcher(feed.Url)
+	if fetcher == nil {
+		fetcher = feedFetcher
+	}
+
+	feedData, err := fetcher(feed.Url)
 	if err != nil {
 		cfg.Logger.Error("failed to scrape feed", "err", err)
 		return err
