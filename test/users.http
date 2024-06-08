@@ -1,0 +1,13 @@
+GET http://localhost:8080/v1/users
+Accept: application/json
+Authorization: ApiKey bd5bf06cf44212cd15cfcbab2ce4f738223b7bdac7b34c6c1a8873c379735f6c
+
+###
+# Create New User
+POST localhost:8080/v1/users
+Content-Type: application/json
+
+{
+  "name": "dorian hansen"
+}
+

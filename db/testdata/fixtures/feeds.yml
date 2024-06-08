@@ -1,0 +1,15 @@
+- id: "5b024738-1068-4e44-b852-9fcfc80222e0"
+  name: "The Boot.dev Blog"
+  url: "https://blog.boot.dev/index.xml"
+  user_id: "606a0cd9-65ae-4fdf-b2b9-52cf7cdcb04c"
+  last_fetched_at:
+  created_at: RAW=NOW() - (INTERVAL '1 hours')
+  updated_at: RAW=NOW() - (INTERVAL '1 hours')
+
+- id: "27418a9b-bbb4-4dbc-b4f1-ad95322e3895"
+  name: "Wagslane"
+  url: "https://wagslane.dev/index.xml"
+  user_id: "606a0cd9-65ae-4fdf-b2b9-52cf7cdcb04c"
+  last_fetched_at:
+  created_at: RAW=NOW() - (INTERVAL '1 hours')
+  updated_at: RAW=NOW() - (INTERVAL '1 hours')
